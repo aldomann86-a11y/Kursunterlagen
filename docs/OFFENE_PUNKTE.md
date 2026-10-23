@@ -7,7 +7,6 @@ Was hier steht, ist nicht entschieden oder nicht erledigt. Entschiedenes wandert
 
 | # | Frage | Empfehlung | Betrifft Etappe | Seit |
 |---|---|---|---|---|
-| F1 | Wohin wird deployt und unter welcher Adresse? | EasyPanel-Server (ATSOBL) wie `feedbackbox`, Subdomain `kurs.kimas.ch`. Steht in einer Stunde, die Volume-Sicherung des Hosts läuft bereits. Der KIMAS-Kern wäre sauberer, kostet aber Servervorlage, Deploy-Schlüssel, restic und DNS – für eine Kurs-App zu viel. | E2 | 2026-10-23 |
 | F2 | Bleibt das Repository public? | Ja. Die Teilnehmer sollen den Code ansehen können, das ist Teil des Kurses. Unterlagen und Secrets liegen ohnehin nicht im Repo. | – | 2026-10-23 |
 
 ## Pendenzen (blockieren nichts)
@@ -26,6 +25,6 @@ Was hier steht, ist nicht entschieden oder nicht erledigt. Entschiedenes wandert
 
 ## Bei Aldo
 
-- [ ] F1 entscheiden (Instanz und Subdomain), damit E2 vor dem Kurs fertig wird
-- [ ] Kursdatum nennen – danach richtet sich, was vorher gebaut sein muss
-- [ ] Erstes Admin-Passwort in `~/.claude/secrets.local.md` ablegen (bei E2)
+- [ ] **DNS:** A-Eintrag `kurs.kimas.ch` auf `46.225.160.97` setzen. Ohne ihn holt
+      Let's Encrypt kein Zertifikat, und niemand erreicht die Seite.
+- [ ] Erstes Admin-Passwort für die Instanz in `~/.claude/secrets.local.md` ablegen

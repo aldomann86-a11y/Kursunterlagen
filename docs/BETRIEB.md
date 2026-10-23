@@ -5,16 +5,16 @@
 | Instanz | URL | Wo | Deploy-Auslöser |
 |---|---|---|---|
 | Lokal | http://127.0.0.1:8050 | `python -m uvicorn app.main:erzeuge_app --factory --reload --port 8050`, Eintrag `kursunterlagen` in `_Claude/.claude/launch.json` | – |
-| Prod | noch offen (Empfehlung `kurs.kimas.ch`) | noch offen – siehe OFFENE_PUNKTE F1 | Push allein deployt **nicht**; Deploy von Hand über `/deploy` |
+| Prod | https://kurs.kimas.ch | EasyPanel-Server (ATSOBL, 46.225.160.97), Projekt und Dienst `kursunterlagen`, Git `main`, Dockerfile-Build, Volume `data` → `/data` | Push allein deployt **nicht**; ausgerollt wird von Hand über `/deploy` |
 
-**Achtung:** Sobald Prod steht, gehört der Auslöser hier hinein. Steht dort je «Push», muss
-die Sicherung **vor** dem Push entstehen.
+**Achtung:** Steht hier je «Push», muss die Sicherung **vor** dem Push entstehen.
 
 Keine Dev-Instanz: lokal reicht die Datenbankdatei unter `./data/`.
 
-## Einrichtung Prod (E2, sobald F1 entschieden ist)
+## Einrichtung Prod (E2, entschieden am 23.10.2026)
 
-Für EasyPanel (Empfehlung), per API wie bei `feedbackbox` und `kimas-post`:
+Für EasyPanel, per API wie bei `feedbackbox` und `kimas-post`. Vorher muss der A-Eintrag
+`kurs.kimas.ch` auf `46.225.160.97` zeigen, sonst gibt es kein Zertifikat:
 
 1. Projekt `kursunterlagen`, Dienst `app`, Git-Quelle `main`, Dockerfile-Build.
 2. Volume `data` auf `/data`. **Darin liegen Datenbank und alle Unterlagen** – ohne Volume
