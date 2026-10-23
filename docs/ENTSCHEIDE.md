@@ -6,9 +6,11 @@ ergänzt einen neuen Eintrag, statt den alten zu ändern.
 ## 2026-10-23 – Prod auf EasyPanel, kurs.kimas.ch
 
 **Entscheid:** Die App läuft auf dem bestehenden EasyPanel-Server (ATSOBL, 46.225.160.97),
-Projekt und Dienst `kursunterlagen`, Build aus dem Dockerfile, Git-Quelle `main` des
+Projekt `kursunterlagen` / Dienst `app`, Build aus dem Dockerfile, Git-Quelle `main` des
 öffentlichen Repos, Volume `data` auf `/data`, Domain `kurs.kimas.ch`. Ein Push allein
-rollt **nicht** aus; ausgerollt wird von Hand über `/deploy`.
+rollt **nicht** aus; ausgerollt wird von Hand über `/deploy`. In Produktion ist der zweite
+Faktor eingeschaltet (`ADMIN_2FA=1`), weil die Bremse hinter dem Reverse-Proxy über einen
+mitgeschickten `X-Forwarded-For` aushebelbar ist.
 **Grund:** Der Server läuft, die Volume-Sicherung des Hosts greift, und eine Instanz steht
 in einer Stunde. Ein eigener Stack auf dem KIMAS-Kern bräuchte Servervorlage, Deploy-
 Schlüssel, restic und DNS – für ein Kursportal unverhältnismässig (F1, erledigt).

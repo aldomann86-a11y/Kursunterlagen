@@ -2,6 +2,9 @@
 .github
 .venv
 data
+# Echte Kursunterlagen und Probierstände gehören nie ins Image (COPY . .).
+_hochladen
+data.vor-unterricht-*
 docs
 tests
 .env

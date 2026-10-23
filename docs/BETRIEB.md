@@ -5,7 +5,7 @@
 | Instanz | URL | Wo | Deploy-Auslöser |
 |---|---|---|---|
 | Lokal | http://127.0.0.1:8050 | `python -m uvicorn app.main:erzeuge_app --factory --reload --port 8050`, Eintrag `kursunterlagen` in `_Claude/.claude/launch.json` | – |
-| Prod | https://kurs.kimas.ch | EasyPanel-Server (ATSOBL, 46.225.160.97), Projekt und Dienst `kursunterlagen`, Git `main`, Dockerfile-Build, Volume `data` → `/data` | Push allein deployt **nicht**; ausgerollt wird von Hand über `/deploy` |
+| Prod | https://kurs.kimas.ch | EasyPanel-Server (ATSOBL, 46.225.160.97), Projekt `kursunterlagen` / Dienst `app`, Git `main`, Dockerfile-Build, Volume `data` → `/data` | Push allein deployt **nicht** (Auto-Deploy bleibt aus); ausgerollt wird von Hand über `/deploy` |
 
 **Achtung:** Steht hier je «Push», muss die Sicherung **vor** dem Push entstehen.
 
@@ -17,12 +17,25 @@ Für EasyPanel, per API wie bei `feedbackbox` und `kimas-post`. Vorher muss der 
 `kurs.kimas.ch` auf `46.225.160.97` zeigen, sonst gibt es kein Zertifikat:
 
 1. Projekt `kursunterlagen`, Dienst `app`, Git-Quelle `main`, Dockerfile-Build.
+   Auto-Deploy **aus** – sonst stimmt die Zeile oben nicht mehr.
 2. Volume `data` auf `/data`. **Darin liegen Datenbank und alle Unterlagen** – ohne Volume
    ist nach jedem Deploy alles weg.
-3. ENV aus `.env.example`: `SECRET_KEY` neu erzeugen, `ADMIN_INITIAL_PASSWORD` einmal setzen,
-   `HTTPS_ONLY=1`, `DATA_DIR=/data`, `ADMIN_2FA` nach Wunsch.
-4. Domain auf Port 8000, DNS-Eintrag der Subdomain.
+3. ENV aus `.env.example`:
+   - `SECRET_KEY` **einmal** erzeugen und in `~/.claude/secrets.local.md` ablegen.
+     Er signiert nicht nur die Sitzungen, er ist auch der HMAC-Schlüssel der Zugangscodes:
+     **wird er später geändert, passt kein ausgegebener Code mehr** (`app/kurse.py`).
+   - `ADMIN_INITIAL_PASSWORD` einmal setzen, nach der ersten Anmeldung leeren.
+   - `HTTPS_ONLY=1` (sonst sind die Cookies nicht `secure`), `DATA_DIR=/data`.
+   - `ADMIN_2FA=1` empfohlen: hinter dem Reverse-Proxy lässt sich die Bremse über einen
+     mitgeschickten `X-Forwarded-For` aushebeln (der Start nutzt `--forwarded-allow-ips='*'`),
+     dann ist der zweite Faktor der eigentliche Schutz des Admin-Logins.
+   - `GIT_SHA` auf den ausgerollten Commit setzen, sonst meldet `/health` eine leere
+     `version` und der Deploy-Nachweis unten greift nicht.
+4. Domain auf Port 8000, A-Eintrag der Subdomain auf 46.225.160.97.
 5. Erster Deploy, anmelden, `ADMIN_INITIAL_PASSWORD` wieder leeren.
+6. Bremse prüfen: zehnmal ein falsches Passwort mit `-H "X-Forwarded-For: 1.2.3.4"`
+   schicken. Greift die Sperre trotzdem, ist alles gut; greift sie nicht, bleibt
+   `ADMIN_2FA=1` Pflicht.
 
 ## Sicherung
 
