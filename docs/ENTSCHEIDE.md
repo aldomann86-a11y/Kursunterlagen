@@ -1,0 +1,103 @@
+# Entscheide
+
+Jeder Eintrag: Datum, Entscheid, Grund, Alternativen. Neueste oben. Wer davon abweicht,
+ergänzt einen neuen Eintrag, statt den alten zu ändern.
+
+## 2026-10-23 – Datenmodell (fünf Tabellen)
+
+**Entscheid:** Das Schema entsteht in `app/db.py` als `CREATE TABLE IF NOT EXISTS`, ohne ORM
+und ohne Alembic. Spätere Spalten kommen über ein geprüftes `ALTER TABLE` dazu (Muster
+`../kimas-post/app/db.py`). Zeiten als ISO-Text in UTC, damit Vergleiche in SQL stimmen.
+
+```sql
+-- Ein Kurs ist die Klammer um die Unterlagen und trägt den Zugangscode.
+CREATE TABLE kurs (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    name          TEXT    NOT NULL,          -- "Claude Code Grundkurs Z-Part"
+    datum         TEXT,                      -- Kursdatum, nur Anzeige
+    code_hash     TEXT    NOT NULL UNIQUE,   -- bcrypt, Klartext nur einmal bei der Vergabe
+    aktiv         INTEGER NOT NULL DEFAULT 1,
+    offen_bis     TEXT,                      -- ab dann kein Zugang mehr (leer = unbefristet)
+    erstellt_am   TEXT    NOT NULL
+);
+
+-- Eine Unterlage ist eine Datei. Die Datei selbst liegt im Dateisystem.
+CREATE TABLE unterlage (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    kurs_id       INTEGER NOT NULL REFERENCES kurs(id),
+    titel         TEXT    NOT NULL,          -- "Teilnehmer-Handout"
+    beschreibung  TEXT,
+    dateiname     TEXT    NOT NULL,          -- Name beim Herunterladen
+    ablage        TEXT    NOT NULL UNIQUE,   -- Name unter DATA_DIR/unterlagen/, selbst vergeben
+    mime          TEXT    NOT NULL,
+    groesse       INTEGER NOT NULL,
+    sortierung    INTEGER NOT NULL DEFAULT 0,
+    sichtbar      INTEGER NOT NULL DEFAULT 1, -- deaktivieren statt löschen
+    hochgeladen_am TEXT   NOT NULL
+);
+CREATE INDEX ix_unterlage_kurs ON unterlage(kurs_id, sortierung);
+
+-- Download-Protokoll, anonym: zeigt was gezogen wurde, nie von wem.
+CREATE TABLE download (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    zeit          TEXT    NOT NULL,
+    kurs_id       INTEGER NOT NULL,
+    unterlage_id  INTEGER NOT NULL
+);
+CREATE INDEX ix_download_zeit ON download(zeit);
+
+-- Ein Admin-Konto, wie in kimas-post.
+CREATE TABLE admin (
+    id              INTEGER PRIMARY KEY CHECK (id = 1),
+    passwort_hash   TEXT    NOT NULL,
+    totp_secret     TEXT,
+    totp_bestaetigt INTEGER NOT NULL DEFAULT 0,
+    erstellt_am     TEXT    NOT NULL
+);
+
+-- Fehlversuche bei der Code-Eingabe, für das Stundenlimit. Älteres wird gelöscht.
+CREATE TABLE versuch (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    zeit          TEXT    NOT NULL,
+    ip_hash       TEXT    NOT NULL           -- HMAC mit SECRET_KEY, nicht rückrechenbar
+);
+CREATE INDEX ix_versuch_zeit ON versuch(zeit, ip_hash);
+```
+
+**Grund:** Fünf Tabellen reichen für Hochladen, Zugang und Download. Ohne ORM ist jeder
+Datenbankzugriff im Kurs am Bildschirm lesbar; SQLite braucht keinen zweiten Dienst.
+**Verworfen:** Dateien als BLOB in der Datenbank (Sicherung und Speicher unnötig teuer);
+Postgres mit SQLAlchemy und Alembic (drei Werkzeuge mehr, die im Kurs erklärt werden müssten);
+Teilnehmer-Tabelle mit Konten (Personendaten, siehe nächster Eintrag).
+
+## 2026-10-23 – Zugang über einen Code je Kurs, keine Konten
+
+**Entscheid:** Teilnehmer geben einen Code je Kurs ein (z. B. `zpart-2026`), bekommen ein
+signiertes Sitzungs-Cookie mit der `kurs_id` und sehen nur die Unterlagen dieses Kurses.
+Keine Registrierung, keine E-Mail, kein Name. Ein Stundenlimit je IP gegen Erraten.
+**Grund:** Ohne Konten gibt es keine Personendaten, also keine Benutzerverwaltung, kein
+Passwort-Reset, keine Löschfristen – und im Kurs ist das in einer Lektion gebaut.
+**Verworfen:** ganz offen (Unterlagen wären öffentlich im Netz); Login je Teilnehmer
+(Personendaten D1, Benutzerverwaltung, Mailversand, Löschfristen – für ein Kurs-Handout
+unverhältnismässig).
+
+## 2026-10-23 – Unterlagen über einen Admin-Bereich hochladen
+
+**Entscheid:** Unterlagen kommen über ein Upload-Formular im Admin-Bereich in die App, nicht
+als Dateien ins Repository. Die Datei landet unter `DATA_DIR/unterlagen/` mit selbst vergebenem
+Namen, die Datenbank hält Titel, Kurs und Herkunftsname.
+**Grund:** Eine neue Unterlage soll keinen Deploy brauchen. Das Repository ist public –
+Unterlagen gehören nicht hinein. Und Formular → Datei → Datenbank → geschützter Download ist
+genau der Bogen, der im Kurs gezeigt werden soll.
+**Verworfen:** Dateien im Repository (jede Änderung ein Deploy, alles öffentlich).
+
+## 2026-10-23 – Python 3.12 + FastAPI + SQLite ohne ORM
+
+**Entscheid:** Stack wie `../kimas-post`: FastAPI, sqlite3 direkt, Jinja2 + HTMX, bcrypt,
+itsdangerous, pytest, Docker. Abweichung vom Projektstandard (PostgreSQL) ist gewollt.
+**Grund:** Das Projekt ist Lehrmittel und Anwendung in einem. Eine Datenbankdatei ohne
+zweiten Dienst läuft lokal sofort, ist in der Sicherung eine Datei und im Kurs erklärbar.
+Die Datenmenge ist winzig (Dutzende Unterlagen, keine gleichzeitigen Schreiber).
+**Verworfen:** Next.js + PostgreSQL (Node, pnpm, Prisma, Datenbank-Container – im Kurs
+Reibung statt Inhalt); Next.js + SQLite (Frontend-Werkzeuge ohne Nutzen für ein Formular
+und eine Liste).
