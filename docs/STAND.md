@@ -3,7 +3,7 @@
 Was hier nicht steht, ist nicht gebaut. Nachgeführt bei jedem `/abschluss`.
 
 **Letzter Stand:** 2026-10-23, **alle Etappen bis E6 gebaut**, 124 Tests grün.
-**Deployed:** noch nicht.
+**Deployed:** https://kurs.kimas.ch, Commit `f3eea07`, 23.10.2026 (EasyPanel, Projekt `kursunterlagen` / Dienst `app`).
 
 ## Etappen
 
@@ -14,7 +14,7 @@ Deploy-Strecke). Im Kurs entsteht die Fachlogik live, mit den Teilnehmern.
 |---|---|---|---|
 | E0 | Projektgerüst, Entscheide, Datenmodell, Doku | vorher | ✅ 2026-10-23 |
 | E1 | Gerüst lauffähig: `pyproject.toml`, `app/config.py`, `app/db.py` mit dem Schema, `/health`, Startseite, Tests, `Dockerfile` | vorher | ✅ 2026-10-23 |
-| E2 | Deploy-Strecke: Instanz, Domain, Volume, Sicherung, Health-Nachweis – leere App live erreichbar | vorher | offen (blockiert: F1) |
+| E2 | Deploy-Strecke: Instanz, Domain, Volume, Health-Nachweis | vorher | ✅ 2026-10-23 (DNS-Eintrag offen) |
 | E3 | Admin-Login (Passwort, 2FA umschaltbar), Grundlayout | vorgezogen | ✅ 2026-10-23 |
 | E4 | Kurse anlegen, Zugangscode erzeugen und anzeigen | vorgezogen | ✅ 2026-10-23 |
 | E5 | Unterlagen hochladen, sortieren, ausblenden | vorgezogen | ✅ 2026-10-23 |
@@ -45,3 +45,11 @@ Deploy-Strecke). Im Kurs entsteht die Fachlogik live, mit den Teilnehmern.
   Originalnamen, fremde Unterlage 404, gesperrter Kurs schliesst den Zugang sofort.
 - 2026-10-23: Zwei Kurse angelegt und die Unterlagen des Kurstags hochgeladen
   (KI: 5 Dateien, Datenmanagement: 2). **Läuft nur lokal** – kein Deploy, siehe F1.
+- 2026-10-23: **Erstmals ausgerollt** auf EasyPanel (Projekt `kursunterlagen`, Dienst
+  `app`, Volume `data` → `/data`, Domain kurs.kimas.ch). `/health` meldet den
+  ausgerollten Commit, Unsinnspfad 404, Startseite und Anmeldung 200 – geprüft über die
+  Server-IP, weil der A-Eintrag für kurs.kimas.ch noch fehlt. Zwei Kurse angelegt und die
+  Unterlagen eingefüllt (KI 5, Datenmanagement 2); zwei Kurse aus einem abgebrochenen
+  ersten Versuch sind gesperrt. Teilnehmerweg live durchgespielt bis zum Download
+  (425 KB PDF, richtiger Dateiname). Admin-Login mit zweitem Faktor, Startpasswort-
+  Variable wieder geleert.
