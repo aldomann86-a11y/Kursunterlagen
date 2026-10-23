@@ -17,6 +17,8 @@ cd C:\Users\aldom\_Claude\kursunterlagen; .venv\Scripts\python.exe -m uvicorn ap
 ```
 
 Anmelden unter `/admin` mit dem Passwort aus deiner `.env` (`ADMIN_INITIAL_PASSWORD`).
+Die Unterlagen für heute liegen hochladebereit in `_hochladen/` (KI und Datenmanagement,
+als PDF gedruckt) – Übersicht und Titel in `_hochladen/LIESMICH.md`.
 Der zweite Faktor ist für den Unterricht ausgeschaltet (`ADMIN_2FA=0`) – kein Handy nötig.
 
 Jeder Prompt sagt ausdrücklich «direkt bauen, keine Rückfragen». Ohne diesen Satz hält sich
@@ -44,8 +46,9 @@ Vorlage app/templates/admin_start.html erweitern, Gestaltung mit dem vorhandenen
 Danach: python -m pytest -q muss grün bleiben. Ergänze zwei Tests in tests/test_admin.py: einen Kurs anlegen zeigt den Code auf der Seite, und ohne Anmeldung ist POST /admin/kurse gesperrt.
 ```
 
-**Vorzeigen:** Kurs «Claude Code Grundkurs» anlegen, Code am Beamer – das ist der Moment,
-in dem die Klasse den Zugang bekommt.
+**Vorzeigen:** Zwei Kurse anlegen – «KI in der Betriebsleiterschule» und
+«Datenmanagement in der Landwirtschaft». Den Code des KI-Kurses am Beamer zeigen:
+das ist der Moment, in dem die Klasse den Zugang bekommt.
 
 ---
 
@@ -68,8 +71,13 @@ Neue Vorlage app/templates/admin_kurs.html, Gestaltung wie bisher.
 Danach: python -m pytest -q grün, plus zwei Tests in tests/test_admin.py: eine PDF-Datei hochladen erscheint in der Liste, eine .exe-Datei wird mit Meldung abgelehnt und landet nicht in der Datenbank.
 ```
 
-**Vorzeigen:** `KI_Schulung/01_Claude_Code_Grundkurs/03_Arbeitsunterlagen/Teilnehmer-Handout.md`
-hochladen – und einmal absichtlich eine `.exe` versuchen, damit die Positivliste sichtbar wird.
+**Vorzeigen:** Aus `_hochladen/KI/` hochladen – Aufgabenblatt, Zusammenfassung,
+Praxis-Prompts, Quellen, Folien (Titel stehen in `_hochladen/LIESMICH.md`), dann
+`_hochladen/Datenmanagement/` in den zweiten Kurs. Einmal absichtlich eine `.exe`
+versuchen, damit die Positivliste sichtbar wird.
+
+**Nicht hochladen:** den Referentenplan (nur für dich) und die Teilnehmerliste
+(Personendaten) – beides steht in `_hochladen/LIESMICH.md`.
 
 ---
 
@@ -92,8 +100,8 @@ Unten auf /unterlagen ein Satz: keine Anmeldung nötig, der Download-Zähler ist
 Danach: python -m pytest -q grün, plus drei Tests in einer neuen Datei tests/test_teilnehmer.py: falscher Code gibt keinen Zugang, richtiger Code zeigt nur die Unterlagen des eigenen Kurses, und der Download einer Unterlage aus einem anderen Kurs gibt 404.
 ```
 
-**Vorzeigen:** Den Code vom Beamer in einem zweiten Browserfenster eingeben, Handout
-herunterladen. Fertig – die Klasse hat die Unterlagen.
+**Vorzeigen:** Den Code vom Beamer in einem zweiten Browserfenster eingeben, das
+Aufgabenblatt herunterladen. Fertig – die Klasse hat die Unterlagen des Tages.
 
 ---
 
