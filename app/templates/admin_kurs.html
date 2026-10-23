@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block titel %}{{ kurs["name"] }} – Kursunterlagen{% endblock %}
+
+{% block kopf_rechts %}
+<form method="post" action="/admin/abmelden" class="kopfform">
+	<button type="submit" class="leise">Abmelden</button>
+</form>
+{% endblock %}
+
+{% block inhalt %}
+<p class="zurueck"><a href="/admin">← Alle Kurse</a></p>
+
+<h1>{{ kurs["name"] }}</h1>
+<p class="fuehrung">
+	{{ kurs["datum"] or "ohne Datum" }} ·
+	{% if kurs["offen_bis"] %}Zugang offen bis {{ kurs["offen_bis"] }}{% else %}unbefristet offen{% endif %}
+	{% if not kurs["aktiv"] %} · <strong>gesperrt</strong>{% endif %}
+</p>
+
+<h2>Unterlagen</h2>
+
+{% if liste %}
+<table class="liste">
+	<thead>
+		<tr><th>Titel</th><th>Datei</th><th>Grösse</th><th>Downloads</th><th></th></tr>
+	</thead>
+	<tbody>
+	{% for u in liste %}
+		<tr{% if not u["sichtbar"] %} class="gesperrt"{% endif %}>
+			<td>
+				{{ u["titel"] }}
+				{% if not u["sichtbar"] %}<span class="merker">ausgeblendet</span>{% endif %}
+				{% if u["beschreibung"] %}<br><span class="klein">{{ u["beschreibung"] }}</span>{% endif %}
+			</td>
+			<td class="klein">{{ u["dateiname"] }}</td>
+			<td>{{ lesbar(u["groesse"]) }}</td>
+			<td>{{ downloads.get(u["id"], 0) }}</td>
+			<td class="tun">
+				<form method="post" action="/admin/unterlagen/{{ u['id'] }}/verschieben">
+					<input type="hidden" name="schritte" value="-1">
+					<button type="submit" class="leise" title="nach oben">↑</button>
+				</form>
+				<form method="post" action="/admin/unterlagen/{{ u['id'] }}/verschieben">
+					<input type="hidden" name="schritte" value="1">
+					<button type="submit" class="leise" title="nach unten">↓</button>
+				</form>
+				<form method="post" action="/admin/unterlagen/{{ u['id'] }}/sichtbarkeit">
+					<button type="submit" class="leise">
+						{{ "Einblenden" if not u["sichtbar"] else "Ausblenden" }}
+					</button>
+				</form>
+			</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% else %}
+<p class="fuehrung">Noch nichts hochgeladen.</p>
+{% endif %}
+
+<h2>Unterlage hochladen</h2>
+
+<form method="post" action="/admin/kurse/{{ kurs['id'] }}/unterlagen"
+      enctype="multipart/form-data">
+	<label for="titel">Titel</label>
+	<input id="titel" name="titel" type="text" required placeholder="Aufgabenblatt">
+
+	<label for="beschreibung">Beschreibung</label>
+	<input id="beschreibung" name="beschreibung" type="text"
+	       placeholder="Zum Mitarbeiten während des Kurses">
+
+	<label for="datei">Datei</label>
+	<input id="datei" name="datei" type="file" required>
+	<p class="feldhinweis">Höchstens {{ max_mb }} MB. Erlaubt: {{ erlaubt }}</p>
+
+	<button type="submit">Hochladen</button>
+</form>
+{% endblock %}

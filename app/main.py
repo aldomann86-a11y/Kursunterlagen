@@ -13,12 +13,12 @@ weder testen noch in einem Lauf ohne .env überhaupt laden.
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app import admin, bremse, config, db, konto
+from app import admin, bremse, config, db, konto, teilnehmer
 from app.sitzung import Sitzungen
 
 HIER = Path(__file__).parent
@@ -62,10 +62,7 @@ def erzeuge_app(einstellungen: config.Einstellungen | None = None) -> FastAPI:
     app.mount("/static", StaticFiles(directory=HIER / "static"), name="static")
     vorlagen = Jinja2Templates(directory=str(HIER / "templates"))
     app.include_router(admin.router(e, datenbank, vorlagen, sitzungen))
-
-    @app.get("/")
-    async def startseite(request: Request):
-        return vorlagen.TemplateResponse(request, "start.html", {})
+    app.include_router(teilnehmer.router(e, datenbank, vorlagen, sitzungen))
 
     @app.get("/health")
     async def health():

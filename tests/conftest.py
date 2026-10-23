@@ -61,6 +61,13 @@ def client_mit_2fa(mach_client) -> TestClient:
 
 
 @pytest.fixture
+def admin(client_mit_konto) -> TestClient:
+    """Angemeldeter Admin ohne zweiten Faktor – für die Seiten dahinter."""
+    client_mit_konto.post("/admin/anmelden", data={"passwort": PASSWORT})
+    return client_mit_konto
+
+
+@pytest.fixture
 def datenbank(einstellungen) -> db.Datenbank:
     d = db.Datenbank(einstellungen.db_pfad)
     d.einrichten()

@@ -10,12 +10,67 @@
 {% block inhalt %}
 <h1>Verwaltung</h1>
 
-<p class="fuehrung">
-	Angemeldet{% if zwei_faktoren %} mit zweitem Faktor{% endif %}.
-</p>
-
-<div class="kasten">
-	<p><strong>Hier entstehen im Kurs die nächsten Schritte.</strong></p>
-	<p>Kurse anlegen und Zugangscodes vergeben, dann Unterlagen hochladen und sortieren.</p>
+{% if neuer_code %}
+<div class="codebox">
+	<p class="codelabel">Zugangscode für «{{ code_kurs["name"] }}»</p>
+	<p class="code">{{ neuer_code }}</p>
+	<p class="codehinweis">
+		Jetzt notieren oder an die Wand werfen – der Code steht nirgends gespeichert und
+		lässt sich nicht nochmals anzeigen. Verloren? Dann einen neuen erzeugen.
+	</p>
 </div>
+{% endif %}
+
+<h2>Kurse</h2>
+
+{% if kursliste %}
+<table class="liste">
+	<thead>
+		<tr><th>Kurs</th><th>Datum</th><th>Offen bis</th><th>Unterlagen</th><th></th></tr>
+	</thead>
+	<tbody>
+	{% for k in kursliste %}
+		<tr{% if not k["aktiv"] %} class="gesperrt"{% endif %}>
+			<td>
+				<a href="/admin/kurse/{{ k['id'] }}">{{ k["name"] }}</a>
+				{% if not k["aktiv"] %}<span class="merker">gesperrt</span>{% endif %}
+			</td>
+			<td>{{ k["datum"] or "–" }}</td>
+			<td>{{ k["offen_bis"] or "unbefristet" }}</td>
+			<td>{{ anzahl.get(k["id"], 0) }}</td>
+			<td class="tun">
+				<form method="post" action="/admin/kurse/{{ k['id'] }}/code">
+					<button type="submit" class="leise">Neuer Code</button>
+				</form>
+				<form method="post" action="/admin/kurse/{{ k['id'] }}/sperren">
+					<button type="submit" class="leise">
+						{{ "Freigeben" if not k["aktiv"] else "Sperren" }}
+					</button>
+				</form>
+			</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% else %}
+<p class="fuehrung">Noch kein Kurs angelegt.</p>
+{% endif %}
+
+<h2>Neuen Kurs anlegen</h2>
+
+<form method="post" action="/admin/kurse">
+	<label for="name">Name</label>
+	<input id="name" name="name" type="text" required placeholder="KI in der Betriebsleiterschule">
+
+	<label for="datum">Kursdatum</label>
+	<input id="datum" name="datum" type="date">
+
+	<label for="offen_bis">Zugang offen bis</label>
+	<input id="offen_bis" name="offen_bis" type="date">
+	<p class="feldhinweis">Leer lassen heisst unbefristet.</p>
+
+	<button type="submit">Kurs anlegen</button>
+</form>
+
+<p class="fuehrung">Angemeldet{% if zwei_faktoren %} mit zweitem Faktor{% endif %}.</p>
 {% endblock %}

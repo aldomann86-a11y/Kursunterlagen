@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block titel %}{{ kurs["name"] }} – Kursunterlagen{% endblock %}
+
+{% block kopf_rechts %}
+<form method="post" action="/abmelden" class="kopfform">
+	<button type="submit" class="leise">Kurs wechseln</button>
+</form>
+{% endblock %}
+
+{% block inhalt %}
+<h1>{{ kurs["name"] }}</h1>
+{% if kurs["datum"] %}<p class="fuehrung">{{ kurs["datum"] }}</p>{% endif %}
+
+{% if liste %}
+<ul class="unterlagen">
+	{% for u in liste %}
+	<li>
+		<div class="was">
+			<a class="titel" href="/unterlagen/{{ u['id'] }}">{{ u["titel"] }}</a>
+			{% if u["beschreibung"] %}<p class="klein">{{ u["beschreibung"] }}</p>{% endif %}
+			<p class="klein">{{ u["dateiname"] }} · {{ lesbar(u["groesse"]) }}</p>
+		</div>
+		<a class="knopf" href="/unterlagen/{{ u['id'] }}">Herunterladen</a>
+	</li>
+	{% endfor %}
+</ul>
+{% else %}
+<p class="fuehrung">Für diesen Kurs ist noch nichts aufgeschaltet.</p>
+{% endif %}
+
+<p class="klein datenschutz">
+	Für den Zugang braucht es kein Konto: wir speichern weder deinen Namen noch deine
+	E-Mail-Adresse. Gezählt wird nur, wie oft eine Unterlage geholt wurde – ohne Bezug
+	zu einer Person.
+</p>
+{% endblock %}

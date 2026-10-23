@@ -164,3 +164,104 @@ code {
 	font-size: 0.9375em;
 	word-break: break-all;
 }
+
+input[type="date"],
+input[type="file"] {
+	width: 100%;
+	padding: 0.55rem 0.7rem;
+	border: 1px solid var(--linie);
+	border-radius: 6px;
+	background: var(--flaeche);
+	color: var(--text);
+	font: inherit;
+}
+
+.feldhinweis {
+	margin: 0.35rem 0 0;
+	color: var(--leise);
+	font-size: 0.875rem;
+}
+
+h2 {
+	margin: 2.25rem 0 0.75rem;
+	font-size: 1.15rem;
+}
+
+.zurueck { margin: 0 0 0.5rem; font-size: 0.9375rem; }
+
+/* Listen */
+
+.liste {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0.5rem 0 0;
+	font-size: 0.9375rem;
+}
+
+.liste th {
+	text-align: left;
+	padding: 0.5rem 0.6rem;
+	border-bottom: 1px solid var(--linie);
+	color: var(--leise);
+	font-size: 0.8125rem;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.liste td {
+	padding: 0.6rem;
+	border-bottom: 1px solid var(--linie);
+	vertical-align: top;
+}
+
+.liste tr.gesperrt td { color: var(--leise); }
+
+.liste .tun {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	justify-content: flex-end;
+}
+
+.liste .tun form { margin: 0; }
+
+.merker {
+	display: inline-block;
+	margin-left: 0.4rem;
+	padding: 0.05rem 0.4rem;
+	border: 1px solid var(--linie);
+	border-radius: 999px;
+	color: var(--leise);
+	font-size: 0.75rem;
+}
+
+.klein { color: var(--leise); font-size: 0.875rem; }
+
+/* Zugangscode nach dem Anlegen */
+
+.codebox {
+	margin: 1.5rem 0;
+	padding: 1.1rem 1.25rem;
+	border: 1px solid var(--akzent);
+	border-radius: 8px;
+	background: var(--flaeche);
+}
+
+.codelabel { margin: 0; color: var(--leise); font-size: 0.875rem; }
+
+.code {
+	margin: 0.35rem 0;
+	font-size: 2.25rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.codehinweis { margin: 0; color: var(--leise); font-size: 0.875rem; }
+
+@media (max-width: 34rem) {
+	.liste thead { display: none; }
+	.liste td { display: block; border: none; padding: 0.2rem 0; }
+	.liste tr { display: block; padding: 0.7rem 0; border-bottom: 1px solid var(--linie); }
+	.liste .tun { justify-content: flex-start; margin-top: 0.4rem; }
+}

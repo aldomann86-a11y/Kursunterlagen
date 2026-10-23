@@ -12,11 +12,11 @@ Ablauf beim Anmelden:
 Es gibt absichtlich keine Protokollzeile und keine Meldung, die verrät, ob ein Konto
 besteht oder welcher Teil der Eingabe falsch war.
 """
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app import bremse, konto
+from app import bremse, konto, kurse, unterlagen
 from app.config import Einstellungen
 from app.db import Datenbank
 from app.sitzung import Sitzungen
@@ -178,16 +178,157 @@ def router(
         sitzungen.admin_anmelden(antwort, zweiter_faktor_offen=False)
         return antwort
 
-    # --- Übersicht -----------------------------------------------------------------
+    # --- Wächter -------------------------------------------------------------------
 
-    @r.get("")
-    async def uebersicht(request: Request):
+    def abgewiesen(request: Request) -> RedirectResponse | None:
+        """Gibt die Weiterleitung zurück, wenn jemand (noch) nicht hineindarf."""
         if sitzungen.admin_lesen(request) is None:
             return weiter("/admin/anmelden")
         if not sitzungen.admin_ist_fertig(request):
             with datenbank.verbindung() as conn:
                 ziel = "/admin/2fa" if zweiter_faktor_noetig(conn) else "/admin/2fa/einrichten"
             return weiter(ziel)
-        return seite(request, "admin_start.html", {"zwei_faktoren": e.admin_2fa})
+        return None
+
+    def uebersicht_inhalt(conn, **zusatz) -> dict:
+        anzahl = {
+            int(z["kurs_id"]): int(z["anzahl"])
+            for z in conn.execute(
+                "SELECT kurs_id, count(*) AS anzahl FROM unterlage GROUP BY kurs_id"
+            )
+        }
+        return {
+            "zwei_faktoren": e.admin_2fa,
+            "kursliste": kurse.alle(conn),
+            "anzahl": anzahl,
+            **zusatz,
+        }
+
+    # --- Übersicht und Kurse -------------------------------------------------------
+
+    @r.get("")
+    async def uebersicht(request: Request):
+        if (ab := abgewiesen(request)) is not None:
+            return ab
+        with datenbank.verbindung() as conn:
+            return seite(request, "admin_start.html", uebersicht_inhalt(conn))
+
+    @r.post("/kurse")
+    async def kurs_anlegen(
+        request: Request,
+        name: str = Form(""),
+        datum: str = Form(""),
+        offen_bis: str = Form(""),
+    ):
+        if (ab := abgewiesen(request)) is not None:
+            return ab
+        with datenbank.verbindung() as conn:
+            try:
+                kurs_id, code = kurse.anlegen(conn, e.secret_key, name, datum, offen_bis)
+            except ValueError as grund:
+                return seite(request, "admin_start.html",
+                             uebersicht_inhalt(conn, fehler=str(grund)), 400)
+            # Kein Redirect: der Klartext-Code wird einmal angezeigt und nirgends
+            # gespeichert – in einer Adresszeile hätte er nichts zu suchen.
+            return seite(request, "admin_start.html",
+                         uebersicht_inhalt(conn, neuer_code=code,
+                                           code_kurs=kurse.finden(conn, kurs_id)))
+
+    @r.post("/kurse/{kurs_id}/code")
+    async def code_erneuern(request: Request, kurs_id: int):
+        if (ab := abgewiesen(request)) is not None:
+            return ab
+        with datenbank.verbindung() as conn:
+            if kurse.finden(conn, kurs_id) is None:
+                return weiter("/admin")
+            code = kurse.code_neu_setzen(conn, e.secret_key, kurs_id)
+            return seite(request, "admin_start.html",
+                         uebersicht_inhalt(conn, neuer_code=code,
+                                           code_kurs=kurse.finden(conn, kurs_id)))
+
+    @r.post("/kurse/{kurs_id}/sperren")
+    async def kurs_sperren(request: Request, kurs_id: int):
+        if (ab := abgewiesen(request)) is not None:
+            return ab
+        with datenbank.verbindung() as conn:
+            kurs = kurse.finden(conn, kurs_id)
+            if kurs is not None:
+                kurse.aktiv_setzen(conn, kurs_id, not kurs["aktiv"])
+        return weiter("/admin")
+
+    # --- Unterlagen eines Kurses ---------------------------------------------------
+
+    def kurs_inhalt(conn, kurs, **zusatz) -> dict:
+        return {
+            "kurs": kurs,
+            "liste": unterlagen.alle_fuer(conn, kurs["id"]),
+            "downloads": unterlagen.downloads_je_unterlage(conn, kurs["id"]),
+            "lesbar": unterlagen.lesbare_groesse,
+            "max_mb": e.max_upload_mb,
+            "erlaubt": ", ".join(sorted(unterlagen.ERLAUBT)),
+            **zusatz,
+        }
+
+    @r.get("/kurse/{kurs_id}")
+    async def kursseite(request: Request, kurs_id: int):
+        if (ab := abgewiesen(request)) is not None:
+            return ab
+        with datenbank.verbindung() as conn:
+            kurs = kurse.finden(conn, kurs_id)
+            if kurs is None:
+                return weiter("/admin")
+            return seite(request, "admin_kurs.html", kurs_inhalt(conn, kurs))
+
+    @r.post("/kurse/{kurs_id}/unterlagen")
+    async def hochladen(
+        request: Request,
+        kurs_id: int,
+        titel: str = Form(""),
+        beschreibung: str = Form(""),
+        datei: UploadFile = File(None),
+    ):
+        if (ab := abgewiesen(request)) is not None:
+            return ab
+        with datenbank.verbindung() as conn:
+            kurs = kurse.finden(conn, kurs_id)
+            if kurs is None:
+                return weiter("/admin")
+            if datei is None or not datei.filename:
+                return seite(request, "admin_kurs.html",
+                             kurs_inhalt(conn, kurs, fehler="Bitte eine Datei wählen."), 400)
+            inhalt = await datei.read()
+            try:
+                unterlagen.speichern(
+                    conn, e.unterlagen_ordner, kurs_id, titel, datei.filename, inhalt,
+                    e.max_upload_bytes, beschreibung,
+                )
+            except unterlagen.Abgelehnt as grund:
+                return seite(request, "admin_kurs.html",
+                             kurs_inhalt(conn, kurs, fehler=str(grund)), 400)
+        return weiter(f"/admin/kurse/{kurs_id}")
+
+    @r.post("/unterlagen/{unterlage_id}/sichtbarkeit")
+    async def sichtbarkeit(request: Request, unterlage_id: int):
+        if (ab := abgewiesen(request)) is not None:
+            return ab
+        with datenbank.verbindung() as conn:
+            zeile = unterlagen.finden(conn, unterlage_id)
+            if zeile is None:
+                return weiter("/admin")
+            unterlagen.sichtbar_setzen(conn, unterlage_id, not zeile["sichtbar"])
+            kurs_id = zeile["kurs_id"]
+        return weiter(f"/admin/kurse/{kurs_id}")
+
+    @r.post("/unterlagen/{unterlage_id}/verschieben")
+    async def verschieben(request: Request, unterlage_id: int, schritte: int = Form(0)):
+        if (ab := abgewiesen(request)) is not None:
+            return ab
+        with datenbank.verbindung() as conn:
+            zeile = unterlagen.finden(conn, unterlage_id)
+            if zeile is None:
+                return weiter("/admin")
+            unterlagen.verschieben(conn, unterlage_id, 1 if schritte > 0 else -1)
+            kurs_id = zeile["kurs_id"]
+        return weiter(f"/admin/kurse/{kurs_id}")
 
     return r
