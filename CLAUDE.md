@@ -5,6 +5,7 @@ sie nach Eingabe eines Zugangscodes herunter. Gebaut wird die App im Kurs selbst
 mit den Teilnehmern – sie bestimmen mit, was sie können soll.
 Kontext: [README.md](README.md). **Vor Änderungen an bestehendem Verhalten zuerst
 [docs/ENTSCHEIDE.md](docs/ENTSCHEIDE.md) lesen** – dort steht, warum etwas so gebaut ist.
+Prompts für den Unterricht: [docs/KURS_PROMPTS.md](docs/KURS_PROMPTS.md).
 Pendenzen: [docs/OFFENE_PUNKTE.md](docs/OFFENE_PUNKTE.md). Was gebaut ist:
 [docs/STAND.md](docs/STAND.md). Deploy und Instanzen: [docs/BETRIEB.md](docs/BETRIEB.md).
 Personendaten, Fristen, Dienste: [docs/DATENSCHUTZ.md](docs/DATENSCHUTZ.md).
@@ -32,8 +33,10 @@ in einer Sitzung verständlich bleibt und lokal ohne Serverdienst läuft
   die Datenbank hält nur Titel, Kurs, Dateiname und Ablagename.
 - **Kein Download ohne Rechteprüfung.** Jeder Download läuft über einen Endpunkt, der die
   Sitzung gegen den Kurs prüft. Kein `StaticFiles` auf dem Upload-Ordner.
-- **Zugangscodes nur als bcrypt-Hash** in der Datenbank, im Klartext nur einmal bei der
-  Vergabe am Bildschirm. Gleiches gilt für das Admin-Passwort.
+- **Zugangscodes nur als HMAC** (`app/kurse.py`, Schlüssel `SECRET_KEY`), im Klartext nur
+  einmal bei der Vergabe am Bildschirm. Das Admin-Passwort als bcrypt-Hash.
+- Fachlogik liegt in `app/kurse.py` und `app/unterlagen.py`, nicht in den Routen.
+  Routen lesen, prüfen die Sitzung und rendern – gerechnet wird in den Modulen.
 - **Keine Personendaten.** Teilnehmer melden sich nicht an; das Download-Protokoll hält
   Zeit und Unterlage, keine IP, keinen Namen (docs/DATENSCHUTZ.md).
 - Zeiten UTC speichern, Anzeige Europe/Zurich. Unterlagen deaktivieren statt löschen.

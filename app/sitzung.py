@@ -13,6 +13,10 @@ ADMIN_COOKIE = "kursunterlagen_admin"
 # Zwölf Stunden: ein Arbeitstag am Stück, danach neu anmelden.
 ADMIN_DAUER = 12 * 60 * 60
 
+TEILNEHMER_COOKIE = "kursunterlagen_kurs"
+# Dreissig Tage: nach dem Kurs soll niemand den Code suchen müssen, um etwas nachzuladen.
+TEILNEHMER_DAUER = 30 * 24 * 60 * 60
+
 
 @dataclass(frozen=True)
 class Sitzungen:
@@ -68,3 +72,19 @@ class Sitzungen:
 
     def admin_abmelden(self, antwort: Response) -> None:
         self.loeschen(antwort, ADMIN_COOKIE)
+
+    # --- Teilnehmer ----------------------------------------------------------------
+
+    def kurs_freigeben(self, antwort: Response, kurs_id: int) -> None:
+        """Nach richtigem Zugangscode: im Cookie steht nur die Kursnummer."""
+        self.setzen(antwort, TEILNEHMER_COOKIE, {"kurs_id": int(kurs_id)}, TEILNEHMER_DAUER)
+
+    def kurs_id(self, request: Request) -> int | None:
+        daten = self.lesen(request, TEILNEHMER_COOKIE, TEILNEHMER_DAUER)
+        if not daten:
+            return None
+        wert = daten.get("kurs_id")
+        return int(wert) if isinstance(wert, int) else None
+
+    def kurs_vergessen(self, antwort: Response) -> None:
+        self.loeschen(antwort, TEILNEHMER_COOKIE)

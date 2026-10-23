@@ -3,6 +3,34 @@
 Jeder Eintrag: Datum, Entscheid, Grund, Alternativen. Neueste oben. Wer davon abweicht,
 ergänzt einen neuen Eintrag, statt den alten zu ändern.
 
+## 2026-10-23 – Zugangscode als HMAC, nicht als bcrypt-Hash
+
+**Entscheid:** Der Zugangscode eines Kurses steht als HMAC-SHA256 (Schlüssel: `SECRET_KEY`)
+in `kurs.code_hash`, mit Unique-Index. Die Prüfung ist damit **eine** Abfrage. Gesäubert
+wird auf Buchstaben und Zahlen, also kommt auch hinein, wer «K7M3 RP29» tippt oder den
+Bindestrich vergisst. Das Admin-Passwort bleibt bcrypt.
+**Grund:** Mit bcrypt müsste jede Eingabe gegen *jeden* Kurs einzeln gerechnet werden –
+bei 20 Kursen mehrere Sekunden je Versuch, und eine Handvoll Aufrufe genügte, um die App
+auszubremsen. Ein Zugangscode ist ein geteiltes Kennwort ohne Personenbezug: der Schutz
+gegen Durchprobieren kommt aus der Bremse (`LIMIT_CODE_STUNDE`), nicht aus der Rechenzeit.
+Ohne `SECRET_KEY` ist der HMAC nicht rückrechenbar – ein nackter SHA-256 über ein
+achtstelliges Wort wäre es.
+**Verworfen:** bcrypt je Kurs (zu langsam, s. o.); Code im Klartext in der Datenbank (ein
+Blick in die Sicherung zeigte alle Kurse); Code nur im Cookie ohne Datenbankprüfung.
+
+## 2026-10-23 – Funktionsschicht vor dem Kurs, Oberfläche im Kurs
+
+**Entscheid:** `app/kurse.py` und `app/unterlagen.py` (Codes, Ablage, Positivliste,
+Rechteprüfung, Zähler) sind samt Tests **vor** dem Kurs gebaut. Im Unterricht entstehen nur
+noch Routen und Vorlagen – die Prompts dafür stehen in `docs/KURS_PROMPTS.md`.
+**Grund:** In rund 15 Minuten Bauzeit muss jeder Schritt sitzen. Was schiefgehen kann
+(Dateinamen, Pfadausbruch, Positivliste, Fristen, anonymes Zählen), ist geprüft; was man
+sehen will (Formular, Liste, Download), entsteht live. Zwei Fehler, die genau so nur hier
+auffielen: `Path(...).name` liest unter Windows `a:b.pdf` als Laufwerk, und ein Code ohne
+Bindestrich passte nicht – beides wäre im Unterricht Zeitverlust gewesen.
+**Verworfen:** alles vorher bauen (dann bleibt nichts zu zeigen); alles live bauen
+(15 Minuten reichen nicht, und ein Fehlschlag vor der Klasse kostet den Rest der Lektion).
+
 ## 2026-10-23 – Admin-Zugang: ein Konto, Cookie-Sitzung, zweiter Faktor umschaltbar
 
 **Entscheid:**
