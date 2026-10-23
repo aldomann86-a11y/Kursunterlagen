@@ -1,6 +1,7 @@
 FROM python:3.13-slim
 
-# Commit-Hash des Builds (setzt der Deploy-Workflow); /health meldet ihn als "version".
+# Commit-Hash des Builds (setzt der Deploy mit E2); solange er fehlt, meldet /health
+# eine leere "version".
 ARG GIT_SHA=
 ENV GIT_SHA=$GIT_SHA
 

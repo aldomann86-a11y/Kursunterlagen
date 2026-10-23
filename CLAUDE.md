@@ -39,7 +39,7 @@ in einer Sitzung verständlich bleibt und lokal ohne Serverdienst läuft
 - Zeiten UTC speichern, Anzeige Europe/Zurich. Unterlagen deaktivieren statt löschen.
 - Nur Dateitypen aus einer Positivliste annehmen, Grösse begrenzt, Dateiname nie vom
   Benutzer übernehmen (eigener Ablagename).
-- Keine CDNs, keine externen Fonts – HTMX liegt im Repo (DS-Basis B3).
+- Keine CDNs, keine externen Fonts – HTMX kommt ins Repo (offen, mit E3; DS-Basis B3).
 
 ## Was in diesem Projekt zusätzlich gesperrt ist
 

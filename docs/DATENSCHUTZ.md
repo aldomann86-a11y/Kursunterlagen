@@ -54,7 +54,7 @@ Keine. Die App verarbeitet nichts mit einem Modell.
 | B3 | keine CDNs/externen Fonts | offen (HTMX ins Repo, mit E3) |
 | B4 | Uploads nur mit Rechteprüfung | offen (mit E6: Download nur über geprüften Endpunkt, kein StaticFiles auf dem Upload-Ordner) |
 | B6 | 2FA Pflicht (ab D2) | nicht Pflicht (D1); umschaltbar über `ADMIN_2FA` |
-| B8 | keine Personendaten in Logs | offen (mit E1: nie Zugangscode oder IP ins Log) |
+| B8 | keine Personendaten in Logs | ✓ (E1 schreibt gar kein Protokoll; bleibt so: nie Zugangscode oder IP ins Log) |
 | B9 | Löschfristen als Job | offen (nach E6) |
 | B10 | Belege nicht hart löschbar | – (keine Belege; Unterlagen werden deaktiviert, nicht gelöscht) |
 | B11 | Auskunftsexport je Person | – (keine Personendaten) |
