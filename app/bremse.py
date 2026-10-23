@@ -23,8 +23,21 @@ def ip_hash(secret_key: str, ip: str | None) -> str:
 
 
 def absender(request: Request, secret_key: str) -> str:
-    """Hinter dem Reverse-Proxy liefert uvicorn mit --proxy-headers die echte IP."""
-    ip = request.client.host if request.client else None
+    """Die Absender-IP, so wie sie der **eigene** Reverse-Proxy gesehen hat.
+
+    `X-Forwarded-For` ist eine Liste: links steht, was der Client selbst mitgeschickt
+    hat – das ist frei erfindbar –, und rechts hängt jeder Proxy an, von wem er die
+    Anfrage bekommen hat. Der **letzte** Eintrag stammt also vom eigenen Proxy und ist
+    der einzige, dem zu trauen ist.
+
+    Warum das zählt: am 23.10.2026 live geprüft, dass zwölf Fehlversuche mit wechselndem
+    `X-Forwarded-For` nie zur Sperre führten, weil uvicorn mit `--forwarded-allow-ips='*'`
+    den ersten Eintrag nimmt (docs/OFFENE_PUNKTE.md). Ohne Proxy – lokal und in den
+    Tests – gibt es die Kopfzeile nicht, dann zählt die Verbindungsadresse.
+    """
+    weitergereicht = request.headers.get("x-forwarded-for", "")
+    kette = [teil.strip() for teil in weitergereicht.split(",") if teil.strip()]
+    ip = kette[-1] if kette else (request.client.host if request.client else None)
     return ip_hash(secret_key, ip)
 
 

@@ -11,14 +11,10 @@ Was hier steht, ist nicht entschieden oder nicht erledigt. Entschiedenes wandert
 
 ## Pendenzen (blockieren nichts)
 
-- [ ] **Bremse greift hinter dem Proxy nicht.** Am 23.10.2026 live geprüft: zwölf
-      Fehlversuche mit wechselndem `X-Forwarded-For` ergaben zwölfmal 401, nie 429.
-      Grund: der Start läuft mit `--forwarded-allow-ips='*'`, uvicorn nimmt dann den
-      **ersten** (frei wählbaren) Eintrag der Kopfzeile als Absender. Bis zur Behebung
-      ist `ADMIN_2FA=1` der eigentliche Schutz des Admin-Logins – nicht ausschalten.
-      Fix: in `app/bremse.py` den **letzten** Eintrag von `X-Forwarded-For` nehmen
-      (der stammt vom eigenen Proxy), statt der Client-IP von uvicorn zu vertrauen.
-      – seit 2026-10-23
+- [ ] **Bremse hinter dem Proxy:** Fix gebaut am 23.10.2026 (`app/bremse.py` nimmt jetzt
+      den letzten `X-Forwarded-For`-Eintrag), **live erst nach dem nächsten Ausrollen**.
+      Danach gegenprüfen: zwölf Fehlversuche mit wechselndem Vorderteil müssen in 429
+      enden. `ADMIN_2FA=1` bleibt in jedem Fall an.
 
 - [ ] HTMX-Datei ins Repo legen, sobald eine Seite sie braucht (E3 kam mit reinen
       Formularen aus; DS-Basis B3) – seit 2026-10-23
@@ -34,6 +30,5 @@ Was hier steht, ist nicht entschieden oder nicht erledigt. Entschiedenes wandert
 
 ## Bei Aldo
 
-- [ ] **DNS:** A-Eintrag `kurs.kimas.ch` auf `46.225.160.97` setzen. Ohne ihn holt
-      Let's Encrypt kein Zertifikat, und niemand erreicht die Seite.
-- [ ] Erstes Admin-Passwort für die Instanz in `~/.claude/secrets.local.md` ablegen
+- [ ] Beim ersten Anmelden den zweiten Faktor auf dem Handy einrichten (Passwort und
+      Schlüssel stehen in `~/.claude/secrets.local.md` unter «Kursunterlagen»)

@@ -114,6 +114,25 @@ def test_zu_viele_fehlversuche_sperren(mach_client):
         assert "Fehlversuche" in gesperrt.text
 
 
+def test_gefaelschte_absender_ip_umgeht_die_bremse_nicht(mach_client):
+    """Der Vorderteil von X-Forwarded-For ist frei erfindbar – die Sperre muss trotzdem greifen."""
+    with mach_client(ADMIN_INITIAL_PASSWORD=PASSWORT, LIMIT_LOGIN_STUNDE=2) as c:
+        for i in (1, 2):
+            antwort = c.post(
+                "/admin/anmelden",
+                data={"passwort": f"falsch-falsch-{i}"},
+                headers={"X-Forwarded-For": f"10.0.0.{i}, 203.0.113.9"},
+            )
+            assert antwort.status_code == 401
+
+        gesperrt = c.post(
+            "/admin/anmelden",
+            data={"passwort": PASSWORT},
+            headers={"X-Forwarded-For": "10.0.0.99, 203.0.113.9"},
+        )
+        assert gesperrt.status_code == 429
+
+
 def test_erfolg_loescht_die_fehlversuche(mach_client):
     with mach_client(ADMIN_INITIAL_PASSWORD=PASSWORT, LIMIT_LOGIN_STUNDE=3) as c:
         c.post("/admin/anmelden", data={"passwort": "falsch-falsch-1"})

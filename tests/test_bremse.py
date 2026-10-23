@@ -1,8 +1,42 @@
 from datetime import timedelta
 
+from starlette.requests import Request
+
 from app import bremse, db
 
 SCHLUESSEL = "nur-fuer-tests"
+
+
+def anfrage(weitergereicht: str | None = None, verbindung: str = "198.51.100.5") -> Request:
+    kopfzeilen = []
+    if weitergereicht is not None:
+        kopfzeilen.append((b"x-forwarded-for", weitergereicht.encode()))
+    return Request({"type": "http", "headers": kopfzeilen, "client": (verbindung, 51234)})
+
+
+# --- Absender hinter dem Reverse-Proxy -------------------------------------------------
+
+def test_ohne_proxy_zaehlt_die_verbindung():
+    assert bremse.absender(anfrage(), SCHLUESSEL) == bremse.ip_hash(SCHLUESSEL, "198.51.100.5")
+
+
+def test_der_letzte_eintrag_zaehlt():
+    """Links steht, was der Client schickt; rechts hängt der eigene Proxy an."""
+    gesehen = bremse.absender(anfrage("1.2.3.4, 203.0.113.9"), SCHLUESSEL)
+    assert gesehen == bremse.ip_hash(SCHLUESSEL, "203.0.113.9")
+    assert gesehen != bremse.ip_hash(SCHLUESSEL, "1.2.3.4")
+
+
+def test_gefaelschter_vorderteil_aendert_nichts():
+    einer = bremse.absender(anfrage("1.2.3.4, 203.0.113.9"), SCHLUESSEL)
+    anderer = bremse.absender(anfrage("9.9.9.9, 203.0.113.9"), SCHLUESSEL)
+    dritter = bremse.absender(anfrage("foo, bar, 203.0.113.9"), SCHLUESSEL)
+    assert einer == anderer == dritter
+
+
+def test_leere_oder_unsinnige_kopfzeile():
+    assert bremse.absender(anfrage(""), SCHLUESSEL) == bremse.absender(anfrage(), SCHLUESSEL)
+    assert bremse.absender(anfrage(" , , "), SCHLUESSEL) == bremse.absender(anfrage(), SCHLUESSEL)
 
 
 def test_ip_hash_ist_stabil_und_verbirgt_die_ip():

@@ -5,7 +5,7 @@
 | Instanz | URL | Wo | Deploy-Auslöser |
 |---|---|---|---|
 | Lokal | http://127.0.0.1:8050 | `python -m uvicorn app.main:erzeuge_app --factory --reload --port 8050`, Eintrag `kursunterlagen` in `_Claude/.claude/launch.json` | – |
-| Prod | https://kurs.kimas.ch | EasyPanel-Server (ATSOBL, 46.225.160.97), Projekt `kursunterlagen` / Dienst `app`, Git `main`, Dockerfile-Build, Volume `data` → `/data` | Push allein deployt **nicht** (Auto-Deploy bleibt aus); ausgerollt wird von Hand über `/deploy` |
+| Prod | https://kurs.dev.kimas.ch | EasyPanel-Server (ATSOBL, 46.225.160.97), Projekt `kursunterlagen` / Dienst `app`, Git `main`, Dockerfile-Build, Volume `data` → `/data` | Push allein deployt **nicht** (Auto-Deploy bleibt aus); ausgerollt wird von Hand über `/deploy` |
 
 **Achtung:** Steht hier je «Push», muss die Sicherung **vor** dem Push entstehen.
 
@@ -13,8 +13,9 @@ Keine Dev-Instanz: lokal reicht die Datenbankdatei unter `./data/`.
 
 ## Einrichtung Prod (E2, entschieden am 23.10.2026)
 
-Für EasyPanel, per API wie bei `feedbackbox` und `kimas-post`. Vorher muss der A-Eintrag
-`kurs.kimas.ch` auf `46.225.160.97` zeigen, sonst gibt es kein Zertifikat:
+Für EasyPanel, per API wie bei `feedbackbox` und `kimas-post`. Ein eigener DNS-Eintrag ist
+nicht nötig: `*.dev.kimas.ch` ist ein Wildcard und zeigt bereits auf 46.225.160.97 –
+deshalb die Adresse unter `dev` und nicht `kurs.kimas.ch` (Entscheid 23.10.2026).
 
 1. Projekt `kursunterlagen`, Dienst `app`, Git-Quelle `main`, Dockerfile-Build.
    Auto-Deploy **aus** – sonst stimmt die Zeile oben nicht mehr.

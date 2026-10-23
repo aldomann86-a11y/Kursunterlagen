@@ -3,7 +3,7 @@
 Was hier nicht steht, ist nicht gebaut. Nachgeführt bei jedem `/abschluss`.
 
 **Letzter Stand:** 2026-10-23, **alle Etappen bis E6 gebaut**, 124 Tests grün.
-**Deployed:** https://kurs.kimas.ch, Commit `f3eea07`, 23.10.2026 (EasyPanel, Projekt `kursunterlagen` / Dienst `app`).
+**Deployed:** https://kurs.dev.kimas.ch, Commit `f3eea07`, 23.10.2026 (EasyPanel, Projekt `kursunterlagen` / Dienst `app`).
 
 ## Etappen
 
@@ -46,9 +46,9 @@ Deploy-Strecke). Im Kurs entsteht die Fachlogik live, mit den Teilnehmern.
 - 2026-10-23: Zwei Kurse angelegt und die Unterlagen des Kurstags hochgeladen
   (KI: 5 Dateien, Datenmanagement: 2). **Läuft nur lokal** – kein Deploy, siehe F1.
 - 2026-10-23: **Erstmals ausgerollt** auf EasyPanel (Projekt `kursunterlagen`, Dienst
-  `app`, Volume `data` → `/data`, Domain kurs.kimas.ch). `/health` meldet den
+  `app`, Volume `data` → `/data`, Domain kurs.dev.kimas.ch). `/health` meldet den
   ausgerollten Commit, Unsinnspfad 404, Startseite und Anmeldung 200 – geprüft über die
-  Server-IP, weil der A-Eintrag für kurs.kimas.ch noch fehlt. Zwei Kurse angelegt und die
+  Server-IP, weil der A-Eintrag für kurs.dev.kimas.ch noch fehlt. Zwei Kurse angelegt und die
   Unterlagen eingefüllt (KI 5, Datenmanagement 2); zwei Kurse aus einem abgebrochenen
   ersten Versuch sind gesperrt. Teilnehmerweg live durchgespielt bis zum Download
   (425 KB PDF, richtiger Dateiname). Admin-Login mit zweitem Faktor, Startpasswort-
