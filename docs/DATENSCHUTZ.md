@@ -23,7 +23,7 @@ Server-Protokolle. Zu den Teilnehmern wird nichts gespeichert.
 | `kurs` (Name, Datum, Code-Hash) | D0 | Unterlagen gruppieren, Zugang prüfen | 12 Mon. nach `offen_bis` | offen (B9) |
 | `unterlage` + Datei im Volume | D0 | Unterlage bereitstellen | mit dem Kurs | offen (B9) |
 | `download` (Zeit, Kurs, Unterlage) | D0 | Zähler, wie oft etwas geholt wurde | 12 Mon. | offen (B9) |
-| `versuch` (Zeit, IP als HMAC) | D1 | Erraten des Codes bremsen | 24 Std. | offen (mit E6) |
+| `versuch` (Zeit, Art, IP als HMAC) | D1 | Erraten von Code und Passwort bremsen | 24 Std. | ✓ (E3: beim Start aufgeräumt) |
 | `admin` (Passwort-Hash, TOTP) | D1 | Admin-Login | mit dem Projekt | – |
 | Reverse-Proxy-Protokoll (IP) | D1 | Betrieb | nach Host-Vorgabe | Host |
 
@@ -51,9 +51,9 @@ Keine. Die App verarbeitet nichts mit einem Modell.
 |---|---|---|
 | B1 | diese Datei | ✓ |
 | B2 | Datenschutzhinweis in der App | offen (mit E6) |
-| B3 | keine CDNs/externen Fonts | offen (HTMX ins Repo, mit E3) |
+| B3 | keine CDNs/externen Fonts | ✓ (eigenes CSS, QR lokal erzeugt; HTMX erst ins Repo, wenn es gebraucht wird) |
 | B4 | Uploads nur mit Rechteprüfung | offen (mit E6: Download nur über geprüften Endpunkt, kein StaticFiles auf dem Upload-Ordner) |
-| B6 | 2FA Pflicht (ab D2) | nicht Pflicht (D1); umschaltbar über `ADMIN_2FA` |
+| B6 | 2FA Pflicht (ab D2) | nicht Pflicht (D1); Schalter `ADMIN_2FA` gebaut (E3) |
 | B8 | keine Personendaten in Logs | ✓ (E1 schreibt gar kein Protokoll; bleibt so: nie Zugangscode oder IP ins Log) |
 | B9 | Löschfristen als Job | offen (nach E6) |
 | B10 | Belege nicht hart löschbar | – (keine Belege; Unterlagen werden deaktiviert, nicht gelöscht) |
@@ -61,4 +61,4 @@ Keine. Die App verarbeitet nichts mit einem Modell.
 | B12 | Backup verschlüsselt ausser Haus, Wiederherstellung geprüft | offen (mit E2) |
 | B13 | Leseprotokoll (nur D3) | – |
 | B14 | Gerätespeicher beim Abmelden leeren | – |
-| B15 | Testdaten erfunden, keine Echtdaten auf Dev | offen (Tests nur mit erfundenen Kursen und Dateien) |
+| B15 | Testdaten erfunden, keine Echtdaten auf Dev | ✓ (62 Tests, erfundene Kurse und Passwörter, eigener Datenordner je Test) |

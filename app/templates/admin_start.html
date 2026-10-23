@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titel %}Verwaltung – Kursunterlagen{% endblock %}
+
+{% block kopf_rechts %}
+<form method="post" action="/admin/abmelden" class="kopfform">
+	<button type="submit" class="leise">Abmelden</button>
+</form>
+{% endblock %}
+
+{% block inhalt %}
+<h1>Verwaltung</h1>
+
+<p class="fuehrung">
+	Angemeldet{% if zwei_faktoren %} mit zweitem Faktor{% endif %}.
+</p>
+
+<div class="kasten">
+	<p><strong>Hier entstehen im Kurs die nächsten Schritte.</strong></p>
+	<p>Kurse anlegen und Zugangscodes vergeben, dann Unterlagen hochladen und sortieren.</p>
+</div>
+{% endblock %}

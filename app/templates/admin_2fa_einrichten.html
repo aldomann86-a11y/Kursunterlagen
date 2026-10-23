@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titel %}Zweiten Faktor einrichten – Kursunterlagen{% endblock %}
+
+{% block inhalt %}
+<h1>Zweiten Faktor einrichten</h1>
+
+<p class="fuehrung">
+	QR-Code in einer Authenticator-App einlesen (zum Beispiel Google Authenticator oder
+	Microsoft Authenticator), dann den angezeigten Code hier eintragen. Erst damit ist der
+	zweite Faktor scharf.
+</p>
+
+<div class="qr">{{ qr | safe }}</div>
+
+<p class="fuehrung">
+	Geht das Einlesen nicht, von Hand eintragen: <code>{{ geheimnis }}</code>
+</p>
+
+<form method="post" action="/admin/2fa/einrichten">
+	<label for="code">Code aus der App</label>
+	<input id="code" name="code" type="text" required autofocus inputmode="numeric"
+	       autocomplete="one-time-code" pattern="[0-9 ]{6,9}" maxlength="9">
+	<button type="submit">Bestätigen</button>
+</form>
+
+<form method="post" action="/admin/abmelden" class="nebenbei">
+	<button type="submit" class="leise">Abbrechen</button>
+</form>
+{% endblock %}

@@ -18,7 +18,8 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app import config, db
+from app import admin, bremse, config, db, konto
+from app.sitzung import Sitzungen
 
 HIER = Path(__file__).parent
 
@@ -26,11 +27,21 @@ HIER = Path(__file__).parent
 def erzeuge_app(einstellungen: config.Einstellungen | None = None) -> FastAPI:
     e = einstellungen or config.lade()
     datenbank = db.Datenbank(e.db_pfad)
+    sitzungen = Sitzungen(secret_key=e.secret_key, https_only=e.https_only)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
         datenbank.einrichten()
         e.unterlagen_ordner.mkdir(parents=True, exist_ok=True)
+        with datenbank.verbindung() as conn:
+            # Erstes Konto, falls noch keines besteht. Ein bestehendes wird nie
+            # überschrieben – die Variable darf also gesetzt bleiben, ohne Schaden.
+            if e.admin_initial_password:
+                try:
+                    konto.anlegen(conn, e.admin_initial_password)
+                except ValueError as grund:
+                    raise RuntimeError(f"ADMIN_INITIAL_PASSWORD geht nicht: {grund}") from None
+            bremse.aufraeumen(conn)
         yield
 
     # Keine automatische API-Oberfläche: die App hat keine öffentliche Schnittstelle,
@@ -50,6 +61,7 @@ def erzeuge_app(einstellungen: config.Einstellungen | None = None) -> FastAPI:
     # sondern über einen Endpunkt mit Rechteprüfung (CLAUDE.md, docs/DATENSCHUTZ.md B4).
     app.mount("/static", StaticFiles(directory=HIER / "static"), name="static")
     vorlagen = Jinja2Templates(directory=str(HIER / "templates"))
+    app.include_router(admin.router(e, datenbank, vorlagen, sitzungen))
 
     @app.get("/")
     async def startseite(request: Request):

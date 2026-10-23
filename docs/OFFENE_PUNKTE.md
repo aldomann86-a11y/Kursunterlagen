@@ -12,7 +12,8 @@ Was hier steht, ist nicht entschieden oder nicht erledigt. Entschiedenes wandert
 
 ## Pendenzen (blockieren nichts)
 
-- [ ] HTMX-Datei ins Repo legen statt CDN (DS-Basis B3) – mit E3 – seit 2026-10-23
+- [ ] HTMX-Datei ins Repo legen, sobald eine Seite sie braucht (E3 kam mit reinen
+      Formularen aus; DS-Basis B3) – seit 2026-10-23
 - [ ] Datenschutzhinweis auf der Teilnehmerseite (B2), ein Satz: keine Anmeldung, anonymer
       Download-Zähler – mit E6 – seit 2026-10-23
 - [ ] Löschfrist der Kurse als Job (B9): Kurs 12 Monate nach `offen_bis` samt Unterlagen weg

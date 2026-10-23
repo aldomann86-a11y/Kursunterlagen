@@ -61,9 +61,10 @@ CREATE TABLE IF NOT EXISTS admin (
 CREATE TABLE IF NOT EXISTS versuch (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     zeit          TEXT    NOT NULL,
+    art           TEXT    NOT NULL DEFAULT 'code',   -- 'code' oder 'login'
     ip_hash       TEXT    NOT NULL
 );
-CREATE INDEX IF NOT EXISTS ix_versuch_zeit ON versuch(zeit, ip_hash);
+CREATE INDEX IF NOT EXISTS ix_versuch_zeit ON versuch(art, zeit, ip_hash);
 """
 
 TABELLEN = ("kurs", "unterlage", "download", "admin", "versuch")
@@ -126,10 +127,8 @@ def spalten(conn: sqlite3.Connection, tabelle: str) -> set[str]:
 
 
 def nachziehen(conn: sqlite3.Connection) -> None:
-    """Spalten, die nach dem ersten Ausrollen dazukamen. Jede Ergänzung mit einem Datum.
-
-    Beispiel für später:
-        if "neue_spalte" not in spalten(conn, "kurs"):
-            conn.execute("ALTER TABLE kurs ADD COLUMN neue_spalte TEXT")
-    """
-    return None
+    """Spalten, die nach dem ersten Ausrollen dazukamen. Jede Ergänzung mit einem Datum."""
+    # 23.10.2026 (E3): `versuch` zählt jetzt auch Fehlversuche beim Admin-Login, nicht nur
+    # beim Zugangscode. Bestehende Zeilen sind Code-Versuche.
+    if "art" not in spalten(conn, "versuch"):
+        conn.execute("ALTER TABLE versuch ADD COLUMN art TEXT NOT NULL DEFAULT 'code'")

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titel %}Anmelden – Kursunterlagen{% endblock %}
+
+{% block inhalt %}
+<h1>Anmelden</h1>
+
+{% if kein_konto %}
+<div class="kasten">
+	<p><strong>Es gibt noch kein Konto.</strong></p>
+	<p>
+		Setze <code>ADMIN_INITIAL_PASSWORD</code> in der Umgebung, starte die Anwendung neu,
+		melde dich an und leere die Variable danach wieder (docs/BETRIEB.md).
+	</p>
+</div>
+{% else %}
+<form method="post" action="/admin/anmelden" autocomplete="on">
+	<label for="passwort">Passwort</label>
+	<input id="passwort" name="passwort" type="password" required autofocus
+	       autocomplete="current-password">
+	<button type="submit">Anmelden</button>
+</form>
+{% endif %}
+{% endblock %}

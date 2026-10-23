@@ -10,6 +10,10 @@ dependencies = [
     "python-multipart>=0.0.9",
     "itsdangerous>=2.2",
     "bcrypt>=4.2",
+    # Zweiter Faktor für das Admin-Login (umschaltbar über ADMIN_2FA): pyotp rechnet die
+    # Codes, segno zeichnet den QR-Code lokal – kein Dienst, keine Fremdquelle.
+    "pyotp>=2.9",
+    "segno>=1.6",
     # Zeitzonen-Daten: Windows und python:3.12-slim bringen keine mit, sonst scheitert
     # ZoneInfo("Europe/Zurich") beim Anzeigen von Zeiten.
     "tzdata>=2024.1",

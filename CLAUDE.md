@@ -15,8 +15,8 @@ was für dieses Projekt dazukommt.
 ## Stack (fix)
 
 Python 3.12 oder neuer (lokal 3.13), FastAPI, **SQLite ohne ORM** (sqlite3, Schema als `CREATE TABLE IF NOT EXISTS`),
-Jinja2 + HTMX, itsdangerous für Sitzungen, bcrypt für Passwort und Zugangscode, pytest,
-Docker. Muster für Aufbau und Betrieb: `../kimas-post` (gleicher Stack, ohne ORM).
+Jinja2 (HTMX erst wenn nötig), itsdangerous für Sitzungen, bcrypt für Passwort und
+Zugangscode, pyotp + segno für den zweiten Faktor, pytest, Docker. Muster für Aufbau und Betrieb: `../kimas-post` (gleicher Stack, ohne ORM).
 
 Gestartet wird als Fabrik: `uvicorn app.main:erzeuge_app --factory`. Das Modul `app.main`
 stellt absichtlich **kein** fertiges App-Objekt bereit, damit schon der Import keine
@@ -39,7 +39,8 @@ in einer Sitzung verständlich bleibt und lokal ohne Serverdienst läuft
 - Zeiten UTC speichern, Anzeige Europe/Zurich. Unterlagen deaktivieren statt löschen.
 - Nur Dateitypen aus einer Positivliste annehmen, Grösse begrenzt, Dateiname nie vom
   Benutzer übernehmen (eigener Ablagename).
-- Keine CDNs, keine externen Fonts – HTMX kommt ins Repo (offen, mit E3; DS-Basis B3).
+- Keine CDNs, keine externen Fonts. HTMX liegt noch nicht im Repo: bisher genügen
+  reine Formulare. Wer es braucht, legt die Datei nach `app/static/` (DS-Basis B3).
 
 ## Was in diesem Projekt zusätzlich gesperrt ist
 

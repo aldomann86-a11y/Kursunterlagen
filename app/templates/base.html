@@ -9,8 +9,10 @@
 <body>
 	<header>
 		<a class="marke" href="/">Kursunterlagen</a>
+		{% block kopf_rechts %}{% endblock %}
 	</header>
 	<main>
+		{% if fehler %}<p class="fehler" role="alert">{{ fehler }}</p>{% endif %}
 		{% block inhalt %}{% endblock %}
 	</main>
 	<footer>

@@ -18,6 +18,7 @@ class Einstellungen:
     data_dir: Path
     max_upload_mb: int
     limit_code_stunde: int
+    limit_login_stunde: int
     version: str            # Commit-Hash aus dem Image (GIT_SHA), leer in der Entwicklung
 
     @property
@@ -98,5 +99,6 @@ def lade(umgebung: dict[str, str] | None = None, pfad: Path | None = None) -> Ei
         data_dir=Path(env.get("DATA_DIR") or "./data"),
         max_upload_mb=_zahl(env.get("MAX_UPLOAD_MB"), 50, "MAX_UPLOAD_MB"),
         limit_code_stunde=_zahl(env.get("LIMIT_CODE_STUNDE"), 20, "LIMIT_CODE_STUNDE"),
+        limit_login_stunde=_zahl(env.get("LIMIT_LOGIN_STUNDE"), 10, "LIMIT_LOGIN_STUNDE"),
         version=(env.get("GIT_SHA") or "").strip()[:40],
     )

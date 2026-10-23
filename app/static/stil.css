@@ -30,10 +30,16 @@ body {
 }
 
 header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
 	border-bottom: 1px solid var(--linie);
 	background: var(--flaeche);
 	padding: 1rem 1.25rem;
 }
+
+.kopfform { margin: 0; }
 
 .marke {
 	color: var(--text);
@@ -78,3 +84,83 @@ footer {
 }
 
 a { color: var(--akzent); }
+
+/* Formulare */
+
+form {
+	margin: 1.5rem 0;
+	max-width: 22rem;
+}
+
+label {
+	display: block;
+	margin-bottom: 0.35rem;
+	font-weight: 600;
+	font-size: 0.9375rem;
+}
+
+input[type="text"],
+input[type="password"] {
+	width: 100%;
+	padding: 0.6rem 0.7rem;
+	border: 1px solid var(--linie);
+	border-radius: 6px;
+	background: var(--flaeche);
+	color: var(--text);
+	font: inherit;
+}
+
+input:focus-visible,
+button:focus-visible {
+	outline: 2px solid var(--akzent);
+	outline-offset: 2px;
+}
+
+button {
+	margin-top: 1rem;
+	padding: 0.6rem 1.1rem;
+	border: 1px solid var(--akzent);
+	border-radius: 6px;
+	background: var(--akzent);
+	color: var(--flaeche);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+button.leise {
+	margin-top: 0;
+	border-color: var(--linie);
+	background: transparent;
+	color: var(--leise);
+	font-weight: 500;
+}
+
+.nebenbei { margin-top: 0.5rem; }
+
+.fehler {
+	margin: 0 0 1.25rem;
+	padding: 0.7rem 0.9rem;
+	border: 1px solid #c0392b;
+	border-left-width: 3px;
+	border-radius: 6px;
+	background: var(--flaeche);
+	color: var(--text);
+}
+
+.qr {
+	display: inline-block;
+	padding: 0.75rem;
+	border: 1px solid var(--linie);
+	border-radius: 6px;
+	background: #ffffff;   /* QR-Codes brauchen weissen Grund, auch im dunklen Modus */
+	line-height: 0;
+}
+
+code {
+	padding: 0.1rem 0.3rem;
+	border-radius: 4px;
+	background: var(--grund);
+	font-size: 0.9375em;
+	word-break: break-all;
+}

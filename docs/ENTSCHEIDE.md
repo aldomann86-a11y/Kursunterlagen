@@ -3,6 +3,31 @@
 Jeder Eintrag: Datum, Entscheid, Grund, Alternativen. Neueste oben. Wer davon abweicht,
 ergänzt einen neuen Eintrag, statt den alten zu ändern.
 
+## 2026-10-23 – Admin-Zugang: ein Konto, Cookie-Sitzung, zweiter Faktor umschaltbar
+
+**Entscheid:**
+- **Ein** Admin-Konto (`admin`, `id = 1`), Passwort als bcrypt-Hash, mindestens 12 Zeichen
+  und höchstens 72 Bytes – länger schneidet bcrypt stillschweigend ab, darum lehnen wir es ab.
+- Erstes Passwort über `ADMIN_INITIAL_PASSWORD` beim Start. Ein **bestehendes** Konto wird
+  nie überschrieben, also darf die Variable gesetzt bleiben.
+- Sitzung als signiertes Cookie (itsdangerous, 12 Stunden, `httponly`, `samesite=lax`,
+  `secure` sobald `HTTPS_ONLY=1`). Kein Sitzungsspeicher auf dem Server; im Cookie steht
+  nur, *dass* jemand angemeldet ist.
+- Zweiter Faktor über `ADMIN_2FA` umschaltbar (TOTP mit **pyotp**, QR-Code lokal mit
+  **segno**). Er wird erst scharf, wenn die erste Eingabe stimmt (`totp_bestaetigt`); ein
+  bestätigter Faktor lässt sich nicht aus einer halb offenen Sitzung ersetzen.
+- Fehlversuche je Stunde und Quelle begrenzt (`LIMIT_LOGIN_STUNDE`, Vorgabe 10). Die
+  Tabelle `versuch` bekommt dafür die Spalte `art` (`'code'` oder `'login'`); bestehende
+  Zeilen gelten als Code-Versuche (`app/db.py`, `nachziehen()`).
+- Die Oberfläche verrät nie, *was* falsch war oder ob ein Konto besteht.
+
+**Grund:** Die globale Regel will einen eigenen Login mit umschaltbarer 2FA, kein Authelia.
+Das Muster steht in `../kimas-post` – gleiche Bausteine, gleiche Begriffe, zwei kleine
+Pakete (pyotp, segno), beide reines Python ohne Übersetzer.
+**Verworfen:** 2FA-Pflicht (D1 verlangt sie nicht; der Schalter genügt); Benutzertabelle mit
+mehreren Konten (es gibt eine Person); Sitzungen in der Datenbank (ein Cookie reicht, nichts
+zu putzen); Passwort-Reset per Mail (dafür gibt es `kimas-post`, erst wenn jemand ihn braucht).
+
 ## 2026-10-23 – Datenmodell (fünf Tabellen)
 
 **Entscheid:** Das Schema entsteht in `app/db.py` als `CREATE TABLE IF NOT EXISTS`, ohne ORM
