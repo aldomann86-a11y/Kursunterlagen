@@ -17,6 +17,9 @@ Was hier steht, ist nicht entschieden oder nicht erledigt. Entschiedenes wandert
       Download-Zähler – mit E6 – seit 2026-10-23
 - [ ] Löschfrist der Kurse als Job (B9): Kurs 12 Monate nach `offen_bis` samt Unterlagen weg
       – nach E6 – seit 2026-10-23
+- [ ] Warnung im Testlauf: `starlette.testclient` empfiehlt `httpx2` statt `httpx`.
+      Erst wechseln, wenn es wirklich bricht – neue Abhängigkeit ohne Not
+      – seit 2026-10-23
 - [ ] Startbestand: die Unterlagen aus `KI_Schulung/01_Claude_Code_Grundkurs` hochladen,
       sobald E5 steht – seit 2026-10-23
 

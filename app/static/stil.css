@@ -1,0 +1,80 @@
+/* Eigenes CSS, keine Fremdquellen: keine CDNs, keine externen Fonts (Datenschutz-Basis B3). */
+
+:root {
+	--text: #1c1d1f;
+	--leise: #5c6066;
+	--linie: #dcdfe4;
+	--flaeche: #ffffff;
+	--grund: #f6f7f9;
+	--akzent: #1f6f5c;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--text: #e9eaec;
+		--leise: #a2a7ae;
+		--linie: #33373d;
+		--flaeche: #1e2024;
+		--grund: #15171a;
+		--akzent: #6fd3b4;
+	}
+}
+
+* { box-sizing: border-box; }
+
+body {
+	margin: 0;
+	background: var(--grund);
+	color: var(--text);
+	font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+header {
+	border-bottom: 1px solid var(--linie);
+	background: var(--flaeche);
+	padding: 1rem 1.25rem;
+}
+
+.marke {
+	color: var(--text);
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	text-decoration: none;
+}
+
+main {
+	max-width: 46rem;
+	margin: 0 auto;
+	padding: 2rem 1.25rem 3rem;
+}
+
+h1 {
+	margin: 0 0 0.75rem;
+	font-size: 1.6rem;
+	line-height: 1.25;
+}
+
+.fuehrung {
+	color: var(--leise);
+	margin: 0 0 1.5rem;
+}
+
+.kasten {
+	border: 1px solid var(--linie);
+	border-left: 3px solid var(--akzent);
+	border-radius: 6px;
+	background: var(--flaeche);
+	padding: 1rem 1.25rem;
+}
+
+.kasten p { margin: 0.35rem 0; }
+
+footer {
+	max-width: 46rem;
+	margin: 0 auto;
+	padding: 0 1.25rem 2rem;
+	color: var(--leise);
+	font-size: 0.875rem;
+}
+
+a { color: var(--akzent); }

@@ -12,7 +12,7 @@ Die App entsteht im Kurs selbst, gemeinsam mit den Teilnehmern.
 python -m venv .venv && .venv/Scripts/activate
 pip install -e ".[test]"
 copy .env.example .env
-python -m uvicorn app.main:app --reload --port 8050
+python -m uvicorn app.main:erzeuge_app --factory --reload --port 8050
 ```
 
 Dann http://127.0.0.1:8050 öffnen. Datenbank und Uploads entstehen unter `./data/`.

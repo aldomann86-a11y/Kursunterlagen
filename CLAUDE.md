@@ -14,9 +14,13 @@ was für dieses Projekt dazukommt.
 
 ## Stack (fix)
 
-Python 3.12, FastAPI, **SQLite ohne ORM** (sqlite3, Schema als `CREATE TABLE IF NOT EXISTS`),
+Python 3.12 oder neuer (lokal 3.13), FastAPI, **SQLite ohne ORM** (sqlite3, Schema als `CREATE TABLE IF NOT EXISTS`),
 Jinja2 + HTMX, itsdangerous für Sitzungen, bcrypt für Passwort und Zugangscode, pytest,
 Docker. Muster für Aufbau und Betrieb: `../kimas-post` (gleicher Stack, ohne ORM).
+
+Gestartet wird als Fabrik: `uvicorn app.main:erzeuge_app --factory`. Das Modul `app.main`
+stellt absichtlich **kein** fertiges App-Objekt bereit, damit schon der Import keine
+Umgebungsvariablen verlangt (Tests, CI).
 
 Kein Postgres, kein Alembic, keine SPA: eine Datei als Datenbank, damit das Projekt im Kurs
 in einer Sitzung verständlich bleibt und lokal ohne Serverdienst läuft
