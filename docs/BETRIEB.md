@@ -4,7 +4,7 @@
 
 | Instanz | URL | Wo | Deploy-Auslöser |
 |---|---|---|---|
-| Lokal | http://127.0.0.1:8020 | `python -m uvicorn app.main:app --reload --port 8020`, Eintrag `kursunterlagen` in `_Claude/.claude/launch.json` | – |
+| Lokal | http://127.0.0.1:8050 | `python -m uvicorn app.main:app --reload --port 8050`, Eintrag `kursunterlagen` in `_Claude/.claude/launch.json` | – |
 | Prod | noch offen (Empfehlung `kurs.kimas.ch`) | noch offen – siehe OFFENE_PUNKTE F1 | Push allein deployt **nicht**; Deploy von Hand über `/deploy` |
 
 **Achtung:** Sobald Prod steht, gehört der Auslöser hier hinein. Steht dort je «Push», muss
